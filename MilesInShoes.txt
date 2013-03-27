@@ -1,0 +1,320 @@
+
+set milesRun to 10
+
+set appTitle to "Running App"
+set calendars to {"jan", "feb", "march"}
+
+set runningCalendar to "Running"
+
+set runningCalendar1 to "T2"
+set runningCalendar2 to "red1"
+set runningCalendar3 to "brooksGreen"
+set runningCalendar4 to "flowRidder"
+
+--set shoeWorn to "no longer matters"
+--set shoeWorn to runningCalendar1
+set shoeWorn1 to runningCalendar1
+set shoeWorn2 to runningCalendar2
+set shoeWorn3 to runningCalendar3
+set shoeWorn4 to runningCalendar4
+
+--set myTestString to "9-triumph-64:30"
+--set myTestString2 to "10-triumph-64:30"
+
+--set myArray to my theSplit(myTestString, "-")
+
+--set val to (my getArrayItem(myArray, 1))
+
+--log "here: " & my getArrayItem(myArray, 1)
+--log "miles: " & miles
+
+--my parseSummary(runningCalendar)
+
+--I want a UI to enter miles, shoe and time which then puts it into the calendar
+
+--I want an UI that lets me filter on shoe type and the UI should show all shoes
+
+--I want to show all shoes at once.
+--set totalMiles to my findEvent(runningCalendar, shoeWorn)
+set totalMiles1 to my findEvent(runningCalendar1, shoeWorn1)
+set totalMiles2 to my findEvent(runningCalendar2, shoeWorn2)
+set totalMiles3 to my findEvent(runningCalendar3, shoeWorn3)
+set totalMiles4 to my findEvent(runningCalendar4, shoeWorn4)
+
+log "total miles: " & totalMiles1
+
+--set message to my dialogText(shoeWorn, totalMiles1)
+set message1 to my dialogText(shoeWorn1, totalMiles1)
+set message2 to my dialogText(shoeWorn2, totalMiles2)
+set message3 to my dialogText(shoeWorn3, totalMiles3)
+set message4 to my dialogText(shoeWorn4, totalMiles4)
+
+
+
+--set message2 to my arrayToString(findEvent(runningCalendar))
+--set message2 to my arrayToString(getListOfCalendars())
+--set message2 to my arrayToString(calendars)
+--display dialog message buttons {"OK", "Cancel"} default button "OK" with title appTitle
+--display dialog message1 buttons {"OK", "Cancel"} default button "OK" with title appTitle
+--display dialog message2 buttons {"OK", "Cancel"} default button "OK" with title appTitle
+--display dialog message3 buttons {"OK", "Cancel"} default button "OK" with title appTitle
+--display dialog message4 buttons {"OK", "Cancel"} default button "OK" with title appTitle
+
+set milesRun1 to my getMilesInMonth(runningCalendar1)
+set milesRun2 to my getMilesInMonth(runningCalendar2)
+set milesRun3 to my getMilesInMonth(runningCalendar3)
+set milesRun4 to my getMilesInMonth(runningCalendar4)
+
+set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
+
+set combinedMessage to message1 & "
+" & message2 & "
+" & message3 & "
+" & message4 & "
+" & messageTotalMiles
+display dialog combinedMessage buttons {"OK", "Cancel"} default button "OK" with title appTitle
+
+on getArrayItem(myArray, location)
+  set x to item location in myArray
+	return x
+end getArrayItem
+
+--gets all the miles for a particular running shoe calendar
+on getMilesInMonth(calendarName)
+	
+	set {year:y, month:m, day:d} to current date
+	set str to (m as string) & " " & (d as string) & " " & (y as string)
+	set today to date str
+	
+	--	set firstStr to (m as string) & " " & (d as string) & " " & (y as string)
+	--	set firstDay to date firstStr 
+	
+	set fdate to "(" & m & "/1/" & y & ")" as string
+	set firstDayOfMonth to date fdate
+	
+	--	log "first day: " & fdate
+	--	set firstDayOfMonth to firstDay
+	
+	set tomorrow to today + 60 * 60 * 24
+	
+	--	log "month: " & month of (current date)
+	--	log "month: " & m
+	set returnV to 0
+	
+	tell application "iCal"
+		tell calendar calendarName
+			set curr to every event whose start date is greater than or equal to firstDayOfMonth and start date is less than or equal to tomorrow
+			set val to 0
+			repeat with an_event in curr
+				--				log "******" & (summary of an_event)
+				set myTestString to my theSplit(summary of an_event, "-")
+				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))
+				set val to returnV
+				
+			end repeat
+		end tell
+	end tell
+	return returnV
+	
+end getMilesInMonth
+
+
+--returns an array of events for a calendar
+--not sure if it's doing all
+--need to find the properties of event
+--need to iterate through the events of a calendar.
+--looks for myCalendar, parses the summary to look for the first item before the dash and totals that value for all events
+--returns the total 
+on findEvent(myCalendar, shoeName)
+	set eventArray to ""
+	tell application "iCal"
+		tell calendar myCalendar
+			set the_events to every event
+			set val to 0
+			repeat with an_event in the_events
+				--parse
+				-- use summary
+				--				log "repeat summary is: " & summary of an_event
+				set myTestString to my theSplit(summary of an_event, "-")
+				set shoe to my getArrayItem(my theSplit(myTestString, "-"), 2)
+				--	log "*******shoe: " & shoe & " ****************" & " shoe2: " & shoeName
+				
+				--disable checking for sneaker since a complicated input dialog isn't possible with free Applescript
+				
+				--		if shoeName is equal to shoe then
+				--			log "only add the following some shoes"
+				
+				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))
+				set val to returnV
+				--		set returnV to returnV + (my getArrayItem(my theSplit(myTestString2, "-"), 1))
+				--		end if
+			end repeat
+			
+			set theEvent to first event
+			--			log "calendar is: " & myCalendar
+			--			log "location is: " & location of theEvent
+			--			log "description is: " & description of theEvent
+			--			log "summary is: " & summary of theEvent
+			
+			
+			set eventArray to eventArray & " " & uid of theEvent
+			--      		return uid of theEvent
+		end tell
+	end tell
+	return returnV
+end findEvent
+
+on theSplit(theString, theDelimiter)
+	-- save delimiters to restore old settings
+	set oldDelimiters to AppleScript's text item delimiters
+	-- set delimiters to delimiter to be used
+	set AppleScript's text item delimiters to theDelimiter
+	-- create the array
+	set theArray to every text item of theString
+	-- restore the old setting
+	set AppleScript's text item delimiters to oldDelimiters
+	-- return the result
+	return theArray
+end theSplit
+
+on parseSummary(summary)
+	
+	set myRunningString to "d=8;s=triumph;t=64:30"
+	set MyString to "30.Rock.S02E03.HDTV-NoTV.avi"
+	
+	-- try to find the season/episode word
+	set TheWord to 0 -- this will be the word number, if found
+	repeat with SomeWord from 1 to (count the words of MyString)
+		get word SomeWord of MyString
+		considering case -- try to exclude as much as possible
+			if (the first character of the result is "S") and (the fourth character of the result is "E") then
+				set TheWord to SomeWord
+				exit repeat
+			end if
+		end considering
+	end repeat
+	if TheWord is 0 then return -- season/episode word not found
+	
+	-- put the various items into variables
+	tell MyString
+		set TheTitle to words 1 thru (TheWord - 1)
+		set TheSeason to (text 2 thru 3 of word TheWord) as integer -- or text
+		set TheEpisode to (text 5 thru 6 of word TheWord) as integer -- or text
+	end tell
+	
+	set {TempTID, AppleScript's text item delimiters} to {AppleScript's text item delimiters, space}
+	set {TheTitle, AppleScript's text item delimiters} to {TheTitle as text, TempTID}
+	
+	log TheTitle & return & "Season " & TheSeason & return & "Episode " & TheEpisode
+end parseSummary
+
+
+on showEvent(myCalendar)
+	tell application "iCal"
+		tell calendar myCalendar
+			set theEvent to first event
+			--show theEvent -- show pops it up in the calendar
+		end tell
+	end tell
+	
+end showEvent
+
+on getListOfCalendars()
+	
+	tell application "iCal"
+		set theCalendarNames to title of every calendar
+	end tell
+	return theCalendarNames
+end getListOfCalendars
+
+
+on arrayToString(calendars)
+	
+	set message to ""
+	
+	repeat with theCurrentValue in calendars
+		set message to message & " " & theCurrentValue
+	end repeat
+	
+	return message
+	
+end arrayToString
+
+
+on dialogText(shoe, miles)
+	set milesAsNum to my int_2_string(milesRun, 10)
+	return shoe & " did " & milesAsNum
+end dialogText
+
+on int_2_string(the_int, base)
+	set digit_string to "0123456789ABCDEF"
+	set the_int to the_int div 1 -- cut off decimals if a float
+	set e to 0
+	
+	set r to ""
+	repeat while the_int > 0
+		set d to (the_int mod base)
+		set d to item (d + 1) of digit_string
+		set r to d & r
+		set e to e + 1
+		set the_int to the_int div base
+	end repeat
+	if r = "" then
+		set r to "0"
+	end if
+	return r
+end int_2_string
+
+on number_to_string(this_number)
+	set this_number to this_number as string
+	if this_number contains "E+" then
+		set x to the offset of "." in this_number
+		set y to the offset of "+" in this_number
+		set z to the offset of "E" in this_number
+		set the decimal_adjust to characters (y - (length of this_number)) thru ¬
+			-1 of this_number as string as number
+		if x is not 0 then
+			set the first_part to characters 1 thru (x - 1) of this_number as string
+		else
+			set the first_part to ""
+		end if
+		set the second_part to characters (x + 1) thru (z - 1) of this_number as string
+		set the converted_number to the first_part
+		repeat with i from 1 to the decimal_adjust
+			try
+				set the converted_number to ¬
+					the converted_number & character i of the second_part
+			on error
+				set the converted_number to the converted_number & "0"
+			end try
+		end repeat
+		return the converted_number
+	else
+		return this_number
+	end if
+end number_to_string
+
+
+on write_to_file(this_data, target_file, append_data) -- (string, file path as string, boolean)
+	try
+		set the target_file to the target_file as text
+		set the open_target_file to ¬
+			open for access file target_file with write permission
+		if append_data is false then ¬
+			set eof of the open_target_file to 0
+		write this_data to the open_target_file starting at eof
+		close access the open_target_file
+		return true
+	on error
+		try
+			close access file target_file
+		end try
+		return false
+	end try
+end write_to_file
+
+on WriteLog(the_text)
+	set this_story to the_text
+	set this_file to (((path to desktop folder) as text) & "My Running Log")
+	my write_to_file(this_story, this_file, true)
+end WriteLog
