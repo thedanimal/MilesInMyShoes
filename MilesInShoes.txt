@@ -6,6 +6,9 @@ set calendars to {"jan", "feb", "march"}
 
 set runningCalendar to "Running"
 
+-- I need to add another Calendar for each sneaker
+-- Better to query for Calendars instead of needing to add one for each new sneaker
+-- getListOfCalendars gets the calendars.
 set runningCalendar1 to "T2"
 set runningCalendar2 to "red1"
 set runningCalendar3 to "brooksGreen"
@@ -37,6 +40,7 @@ set milesRun2 to my getMilesInMonth(runningCalendar2)
 set milesRun3 to my getMilesInMonth(runningCalendar3)
 set milesRun4 to my getMilesInMonth(runningCalendar4)
 
+-- this means 
 set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
 
 set combinedMessage to message1 & "
