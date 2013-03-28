@@ -11,31 +11,15 @@ set runningCalendar2 to "red1"
 set runningCalendar3 to "brooksGreen"
 set runningCalendar4 to "flowRidder"
 
---set shoeWorn to "no longer matters"
---set shoeWorn to runningCalendar1
 set shoeWorn1 to runningCalendar1
 set shoeWorn2 to runningCalendar2
 set shoeWorn3 to runningCalendar3
 set shoeWorn4 to runningCalendar4
 
---set myTestString to "9-triumph-64:30"
---set myTestString2 to "10-triumph-64:30"
-
---set myArray to my theSplit(myTestString, "-")
-
---set val to (my getArrayItem(myArray, 1))
-
---log "here: " & my getArrayItem(myArray, 1)
---log "miles: " & miles
-
---my parseSummary(runningCalendar)
-
 --I want a UI to enter miles, shoe and time which then puts it into the calendar
 
 --I want an UI that lets me filter on shoe type and the UI should show all shoes
 
---I want to show all shoes at once.
---set totalMiles to my findEvent(runningCalendar, shoeWorn)
 set totalMiles1 to my findEvent(runningCalendar1, shoeWorn1)
 set totalMiles2 to my findEvent(runningCalendar2, shoeWorn2)
 set totalMiles3 to my findEvent(runningCalendar3, shoeWorn3)
@@ -43,22 +27,10 @@ set totalMiles4 to my findEvent(runningCalendar4, shoeWorn4)
 
 log "total miles: " & totalMiles1
 
---set message to my dialogText(shoeWorn, totalMiles1)
 set message1 to my dialogText(shoeWorn1, totalMiles1)
 set message2 to my dialogText(shoeWorn2, totalMiles2)
 set message3 to my dialogText(shoeWorn3, totalMiles3)
 set message4 to my dialogText(shoeWorn4, totalMiles4)
-
-
-
---set message2 to my arrayToString(findEvent(runningCalendar))
---set message2 to my arrayToString(getListOfCalendars())
---set message2 to my arrayToString(calendars)
---display dialog message buttons {"OK", "Cancel"} default button "OK" with title appTitle
---display dialog message1 buttons {"OK", "Cancel"} default button "OK" with title appTitle
---display dialog message2 buttons {"OK", "Cancel"} default button "OK" with title appTitle
---display dialog message3 buttons {"OK", "Cancel"} default button "OK" with title appTitle
---display dialog message4 buttons {"OK", "Cancel"} default button "OK" with title appTitle
 
 set milesRun1 to my getMilesInMonth(runningCalendar1)
 set milesRun2 to my getMilesInMonth(runningCalendar2)
@@ -86,19 +58,11 @@ on getMilesInMonth(calendarName)
 	set str to (m as string) & " " & (d as string) & " " & (y as string)
 	set today to date str
 	
-	--	set firstStr to (m as string) & " " & (d as string) & " " & (y as string)
-	--	set firstDay to date firstStr 
-	
 	set fdate to "(" & m & "/1/" & y & ")" as string
 	set firstDayOfMonth to date fdate
 	
-	--	log "first day: " & fdate
-	--	set firstDayOfMonth to firstDay
-	
 	set tomorrow to today + 60 * 60 * 24
 	
-	--	log "month: " & month of (current date)
-	--	log "month: " & m
 	set returnV to 0
 	
 	tell application "iCal"
@@ -106,7 +70,6 @@ on getMilesInMonth(calendarName)
 			set curr to every event whose start date is greater than or equal to firstDayOfMonth and start date is less than or equal to tomorrow
 			set val to 0
 			repeat with an_event in curr
-				--				log "******" & (summary of an_event)
 				set myTestString to my theSplit(summary of an_event, "-")
 				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))
 				set val to returnV
@@ -176,38 +139,6 @@ on theSplit(theString, theDelimiter)
 	-- return the result
 	return theArray
 end theSplit
-
-on parseSummary(summary)
-	
-	set myRunningString to "d=8;s=triumph;t=64:30"
-	set MyString to "30.Rock.S02E03.HDTV-NoTV.avi"
-	
-	-- try to find the season/episode word
-	set TheWord to 0 -- this will be the word number, if found
-	repeat with SomeWord from 1 to (count the words of MyString)
-		get word SomeWord of MyString
-		considering case -- try to exclude as much as possible
-			if (the first character of the result is "S") and (the fourth character of the result is "E") then
-				set TheWord to SomeWord
-				exit repeat
-			end if
-		end considering
-	end repeat
-	if TheWord is 0 then return -- season/episode word not found
-	
-	-- put the various items into variables
-	tell MyString
-		set TheTitle to words 1 thru (TheWord - 1)
-		set TheSeason to (text 2 thru 3 of word TheWord) as integer -- or text
-		set TheEpisode to (text 5 thru 6 of word TheWord) as integer -- or text
-	end tell
-	
-	set {TempTID, AppleScript's text item delimiters} to {AppleScript's text item delimiters, space}
-	set {TheTitle, AppleScript's text item delimiters} to {TheTitle as text, TempTID}
-	
-	log TheTitle & return & "Season " & TheSeason & return & "Episode " & TheEpisode
-end parseSummary
-
 
 on showEvent(myCalendar)
 	tell application "iCal"
