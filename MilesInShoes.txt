@@ -1,4 +1,4 @@
--- Is this variable being used.
+-- Is this variable being used?
 set milesRun to 10
 
 set appTitle to "Running App"
