@@ -6,6 +6,5 @@ AppleScript which displays the number of miles for sneakers using iCal for stora
 For another Mac and running centric program, see [Pace Converter](https://github.com/thedanimal/PaceConverter).
 
 ==========
-[![githalytics.com
-alpha](https://cruel-carlota.pagodabox.com/fd3604c6a8ea6065e4a78c209206db0e
-"githalytics.com")](http://githalytics.com/thedanimal/MilesInMyShoes)
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/4fa867183658d2ae4536648dc9108aec "githalytics.com")](http://githalytics.com/thedanimal/MilesInMyShoes)
