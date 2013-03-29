@@ -1,11 +1,8 @@
-
-set milesRun to 10
-
 set appTitle to "Running App"
-set calendars to {"jan", "feb", "march"}
 
-set runningCalendar to "Running"
-
+-- I need to add another Calendar for each sneaker
+-- Better to query for Calendars instead of needing to add one for each new sneaker
+-- getListOfCalendars gets the calendars.
 set runningCalendar1 to "T2"
 set runningCalendar2 to "red1"
 set runningCalendar3 to "brooksGreen"
@@ -15,10 +12,6 @@ set shoeWorn1 to runningCalendar1
 set shoeWorn2 to runningCalendar2
 set shoeWorn3 to runningCalendar3
 set shoeWorn4 to runningCalendar4
-
---I want a UI to enter miles, shoe and time which then puts it into the calendar
-
---I want an UI that lets me filter on shoe type and the UI should show all shoes
 
 set totalMiles1 to my findEvent(runningCalendar1, shoeWorn1)
 set totalMiles2 to my findEvent(runningCalendar2, shoeWorn2)
@@ -37,6 +30,7 @@ set milesRun2 to my getMilesInMonth(runningCalendar2)
 set milesRun3 to my getMilesInMonth(runningCalendar3)
 set milesRun4 to my getMilesInMonth(runningCalendar4)
 
+-- this means 
 set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
 
 set combinedMessage to message1 & "
@@ -157,20 +151,6 @@ on getListOfCalendars()
 	end tell
 	return theCalendarNames
 end getListOfCalendars
-
-
-on arrayToString(calendars)
-	
-	set message to ""
-	
-	repeat with theCurrentValue in calendars
-		set message to message & " " & theCurrentValue
-	end repeat
-	
-	return message
-	
-end arrayToString
-
 
 on dialogText(shoe, miles)
 	set milesAsNum to my int_2_string(milesRun, 10)
