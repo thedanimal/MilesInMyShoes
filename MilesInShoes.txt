@@ -1,4 +1,6 @@
 set appTitle to "Running App"
+-- This application uses iCal entries to track how many miles each sneaker has 
+-- and the total miles for the month (for all sneakers)
 
 -- I need to add another Calendar for each sneaker
 -- Better to query for Calendars instead of needing to add one for each new sneaker
