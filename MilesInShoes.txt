@@ -1,4 +1,6 @@
 set appTitle to "Running App"
+-- New Feature: get the total time in seconds for the workouts in a month
+
 
 -- I need to add another Calendar for each sneaker
 -- Better to query for Calendars instead of needing to add one for each new sneaker
@@ -25,10 +27,15 @@ set message2 to my dialogText(shoeWorn2, totalMiles2)
 set message3 to my dialogText(shoeWorn3, totalMiles3)
 set message4 to my dialogText(shoeWorn4, totalMiles4)
 
-set milesRun1 to my getMilesInMonth(runningCalendar1)
-set milesRun2 to my getMilesInMonth(runningCalendar2)
-set milesRun3 to my getMilesInMonth(runningCalendar3)
-set milesRun4 to my getMilesInMonth(runningCalendar4)
+
+getSecondsInMonth
+--commented out because I just want to test getting the seconds
+ set milesRun1 to my getSecondsInMonth(runningCalendar1)
+
+-- set milesRun1 to my getMilesInMonth(runningCalendar1)
+-- set milesRun2 to my getMilesInMonth(runningCalendar2)
+-- set milesRun3 to my getMilesInMonth(runningCalendar3)
+-- set milesRun4 to my getMilesInMonth(runningCalendar4)
 
 -- this means 
 set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
@@ -74,6 +81,42 @@ on getMilesInMonth(calendarName)
 	return returnV
 	
 end getMilesInMonth
+
+on getSecondsInMonth(calendarName)
+    
+    set {year:y, month:m, day:d} to current date
+    set str to (m as string) & " " & (d as string) & " " & (y as string)
+    set today to date str
+    
+    set fdate to "(" & m & "/1/" & y & ")" as string
+    set firstDayOfMonth to date fdate
+    
+    set tomorrow to today + 60 * 60 * 24
+    
+    set returnV to 0
+    
+    tell application "iCal"
+        tell calendar calendarName
+            set curr to every event whose start date is greater than or equal to firstDayOfMonth and start date is less than or equal to tomorrow
+            set val to 0
+            repeat with an_event in curr
+                set myTestString to my theSplit(summary of an_event, "-")
+--                set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 3))
+                set returnV to (my convertHMSToSeconds (my getArrayItem(my theSplit(myTestString, "-"), 3)))
+                set val to returnV
+                
+            end repeat
+        end tell
+    end tell
+    return returnV
+    
+end getMilesInMonth
+
+on convertHMSToSeconds(hms)
+                --  log "*******shoe: " & shoe & " ****************" & " shoe2: " & shoeName
+    log "in convertHMSToSeconds " & hms
+end convertHMStoSeconds
+
 
 
 --returns an array of events for a calendar
