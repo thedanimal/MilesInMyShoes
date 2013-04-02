@@ -4,9 +4,11 @@ set appTitle to "Running App"
 -- Better to query for Calendars instead of needing to add one for each new sneaker
 -- getListOfCalendars gets the calendars.
 
-set isDebug to 1
+-- can I use a global variable for total seconds so I don't have to iterate through the calendars twice?
 
-if isDebug is 1 then
+set isDebug to 0
+
+if isDebug is 0 then
 	set runningCalendar1 to "T2"
 	set runningCalendar2 to "red1"
 	set runningCalendar3 to "brooksGreen"
@@ -18,12 +20,9 @@ if isDebug is 1 then
 	set shoeWorn4 to runningCalendar4
 	
 	set totalMiles1 to my findEvent(runningCalendar1, shoeWorn1)
-	
 	set totalMiles2 to my findEvent(runningCalendar2, shoeWorn2)
 	set totalMiles3 to my findEvent(runningCalendar3, shoeWorn3)
 	set totalMiles4 to my findEvent(runningCalendar4, shoeWorn4)
-	
-	-- log "total miles: " & totalMiles1
 	
 	set message1 to my dialogText(shoeWorn1, totalMiles1)
 	set message2 to my dialogText(shoeWorn2, totalMiles2)
@@ -41,9 +40,11 @@ if isDebug is 1 then
 	set milesRun4 to my getMilesInMonth(runningCalendar4)
 	
 	set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
-	
 	set messageTotalSeconds to "Time for the month: " & (my getHMS(SecondsRun1 + SecondsRun2 + SecondsRun3 + SecondsRun4))
-	set messageTotalMiles to messageTotalMiles --& " " & messageTotalSeconds
+	
+	--add another line that gets the month pace
+	
+	set messageTotalMiles to messageTotalMiles 
 	set combinedMessage to messageTotalMiles
 	
 	set combinedMessage to message1 & "
@@ -53,15 +54,13 @@ if isDebug is 1 then
 
 " & messageTotalMiles & "
 " & messageTotalSeconds
-	
-	-- show this when ready to run normal program
 	display dialog combinedMessage buttons {"OK", "Cancel"} default button "OK" with title appTitle
 else
 	set message to (my getHMS(5850))
 	display dialog message buttons {"OK", "Cancel"} default button "OK" with title appTitle
 	
 end if
--- here on is the functions to do all the calculations
+-- here on are the functions to do all the calculations ---------------------
 
 -- if it can't access the array item, return -1
 on getArrayItem(myArray, location)
@@ -125,7 +124,6 @@ on getSecondsInMonth(calendarName)
 				set myTestString to my theSplit(summary of an_event, "-")
 				
 				set getTime to (my getArrayItem(myTestString, 3))
-				--getTime = 1:37:30
 				
 				set myHMS to my theSplit(getTime, ":")
 				set hour to 0
@@ -149,13 +147,7 @@ on getSecondsInMonth(calendarName)
 					
 				end if
 				
-				--				display dialog hour buttons {"OK", "Cancel"} default button "OK" with title "debug"
-				--				display dialog mins buttons {"OK", "Cancel"} default button "OK" with title "debug"
-				--				display dialog secs buttons {"OK", "Cancel"} default button "OK" with title "debug"
-				-- pause here because it's the 1st day of the week and I don't feel like
-				-- changing the calendar loop to test
 				set totalSeconds to (totalSeconds + ((hour * 3600) + (mins * 60) + secs)) --5850 + 2145 = 7995
-				--				display dialog totalSeconds buttons {"OK", "Cancel"} default button "OK" with title "debug"
 			end repeat
 		end tell
 	end tell
@@ -187,7 +179,7 @@ on getHMS(totalSeconds)
 		set secs to "0" & secs
 	end if
 	
-	set convertSeconds to ("" & hour & ":" & mins & ":" & secs) --5850 =1:37:30
+	set convertSeconds to ("" & hour & ":" & mins & ":" & secs) 
 	return convertSeconds
 end getHMS
 
@@ -226,53 +218,19 @@ on findEvent(myCalendar, shoeName)
 			set val to 0
 			repeat with an_event in the_events
 				--parse
-				-- use summary
-				--				log "repeat summary is: " & summary of an_event
-				set myTestString to my theSplit(summary of an_event, "-")
+				set myTestString to my theSplit(summary of an_event, "-")				
 				set shoe to my getArrayItem(my theSplit(myTestString, "-"), 2)
-				--	log "*******shoe: " & shoe & " ****************" & " shoe2: " & shoeName
-				
-				--disable checking for sneaker since a complicated input dialog isn't possible with free Applescript
-				
-				--		if shoeName is equal to shoe then
-				--			log "only add the following some shoes"
 				
 				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))
 				set val to returnV
-				--		set returnV to returnV + (my getArrayItem(my theSplit(myTestString2, "-"), 1))
-				--		end if
 			end repeat
 			
 			set theEvent to first event
-			--			log "calendar is: " & myCalendar
-			--			log "location is: " & location of theEvent
-			--			log "description is: " & description of theEvent
-			--			log "summary is: " & summary of theEvent
-			
-			
 			set eventArray to eventArray & " " & uid of theEvent
-			--      		return uid of theEvent
 		end tell
 	end tell
 	return returnV
 end findEvent
-
-on theSplitInts(theString, theDelimiter)
-	
-	set logm to "in theSplitInts " & theString
-	display dialog logm buttons {"OK", "Cancel"} default button "OK" with title "debug"
-	
-	-- save delimiters to restore old settings
-	set oldDelimiters to AppleScript's text item delimiters
-	-- set delimiters to delimiter to be used
-	set AppleScript's text item delimiters to theDelimiter
-	-- create the array
-	set theArray to every text item of theString
-	-- restore the old setting
-	set AppleScript's text item delimiters to oldDelimiters
-	-- return the result
-	return theArray
-end theSplitInts
 
 on theSplit(theString, theDelimiter)
 	-- save delimiters to restore old settings
@@ -335,6 +293,7 @@ on number_to_string(this_number)
 		set x to the offset of "." in this_number
 		set y to the offset of "+" in this_number
 		set z to the offset of "E" in this_number
+		-- git doesn't recognize the special character (¬)  by typing option-L
 		set the decimal_adjust to characters (y - (length of this_number)) thru ¬
 			-1 of this_number as string as number
 		if x is not 0 then
@@ -346,6 +305,7 @@ on number_to_string(this_number)
 		set the converted_number to the first_part
 		repeat with i from 1 to the decimal_adjust
 			try
+				-- git doesn't recognize the special character by typing option-L
 				set the converted_number to ¬
 					the converted_number & character i of the second_part
 			on error
@@ -358,8 +318,7 @@ on number_to_string(this_number)
 	end if
 end number_to_string
 
-
-on write_to_file(this_data, target_file, append_data) -- (string, file path as string, boolean)
+on write_to_file(this_data, target_file, append_data)
 	try
 		set the target_file to the target_file as text
 		set the open_target_file to ¬
