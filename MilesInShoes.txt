@@ -1,7 +1,385 @@
-set appTitle to "Running App"-- I need to add another Calendar for each sneaker-- Better to query for Calendars instead of needing to add one for each new sneaker-- getListOfCalendars gets the calendars.set isDebug to 1if isDebug is 1 then	set runningCalendar1 to "T2"	set runningCalendar2 to "red1"	set runningCalendar3 to "brooksGreen"	set runningCalendar4 to "flowRidder"		set shoeWorn1 to runningCalendar1	set shoeWorn2 to runningCalendar2	set shoeWorn3 to runningCalendar3	set shoeWorn4 to runningCalendar4		set totalMiles1 to my findEvent(runningCalendar1, shoeWorn1)		set totalMiles2 to my findEvent(runningCalendar2, shoeWorn2)	set totalMiles3 to my findEvent(runningCalendar3, shoeWorn3)	set totalMiles4 to my findEvent(runningCalendar4, shoeWorn4)		-- log "total miles: " & totalMiles1		set message1 to my dialogText(shoeWorn1, totalMiles1)	set message2 to my dialogText(shoeWorn2, totalMiles2)	set message3 to my dialogText(shoeWorn3, totalMiles3)	set message4 to my dialogText(shoeWorn4, totalMiles4)		set SecondsRun1 to my getSecondsInMonth(runningCalendar1)	set SecondsRun2 to my getSecondsInMonth(runningCalendar2)	set SecondsRun3 to my getSecondsInMonth(runningCalendar3)	set SecondsRun4 to my getSecondsInMonth(runningCalendar4)		set milesRun1 to my getMilesInMonth(runningCalendar1)	set milesRun2 to my getMilesInMonth(runningCalendar2)	set milesRun3 to my getMilesInMonth(runningCalendar3)	set milesRun4 to my getMilesInMonth(runningCalendar4)		set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4		set messageTotalSeconds to "Time for the month: " & (my getHMS(SecondsRun1 + SecondsRun2 + SecondsRun3 + SecondsRun4))	set messageTotalMiles to messageTotalMiles --& " " & messageTotalSeconds	set combinedMessage to messageTotalMiles		set combinedMessage to message1 & "
+set appTitle to "Running App"
+
+-- I need to add another Calendar for each sneaker
+-- Better to query for Calendars instead of needing to add one for each new sneaker
+-- getListOfCalendars gets the calendars.
+
+set isDebug to 1
+
+if isDebug is 1 then
+	set runningCalendar1 to "T2"
+	set runningCalendar2 to "red1"
+	set runningCalendar3 to "brooksGreen"
+	set runningCalendar4 to "flowRidder"
+	
+	set shoeWorn1 to runningCalendar1
+	set shoeWorn2 to runningCalendar2
+	set shoeWorn3 to runningCalendar3
+	set shoeWorn4 to runningCalendar4
+	
+	set totalMiles1 to my findEvent(runningCalendar1, shoeWorn1)
+	
+	set totalMiles2 to my findEvent(runningCalendar2, shoeWorn2)
+	set totalMiles3 to my findEvent(runningCalendar3, shoeWorn3)
+	set totalMiles4 to my findEvent(runningCalendar4, shoeWorn4)
+	
+	-- log "total miles: " & totalMiles1
+	
+	set message1 to my dialogText(shoeWorn1, totalMiles1)
+	set message2 to my dialogText(shoeWorn2, totalMiles2)
+	set message3 to my dialogText(shoeWorn3, totalMiles3)
+	set message4 to my dialogText(shoeWorn4, totalMiles4)
+	
+	set SecondsRun1 to my getSecondsInMonth(runningCalendar1)
+	set SecondsRun2 to my getSecondsInMonth(runningCalendar2)
+	set SecondsRun3 to my getSecondsInMonth(runningCalendar3)
+	set SecondsRun4 to my getSecondsInMonth(runningCalendar4)
+	
+	set milesRun1 to my getMilesInMonth(runningCalendar1)
+	set milesRun2 to my getMilesInMonth(runningCalendar2)
+	set milesRun3 to my getMilesInMonth(runningCalendar3)
+	set milesRun4 to my getMilesInMonth(runningCalendar4)
+	
+	set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
+	
+	set messageTotalSeconds to "Time for the month: " & (my getHMS(SecondsRun1 + SecondsRun2 + SecondsRun3 + SecondsRun4))
+	set messageTotalMiles to messageTotalMiles --& " " & messageTotalSeconds
+	set combinedMessage to messageTotalMiles
+	
+	set combinedMessage to message1 & "
 " & message2 & "
 " & message3 & "
 " & message4 & "
 
 " & messageTotalMiles & "
-" & messageTotalSeconds		-- show this when ready to run normal program	display dialog combinedMessage buttons {"OK", "Cancel"} default button "OK" with title appTitleelse	set message to (my getHMS(5850))	display dialog message buttons {"OK", "Cancel"} default button "OK" with title appTitle	end if-- here on is the functions to do all the calculations-- if it can't access the array item, return -1on getArrayItem(myArray, location)	try		set x to item location in myArray		return x	on error errText number errNum		return -1	end tryend getArrayItem-- gets all the miles for a particular running shoe calendaron getMilesInMonth(calendarName)		set {year:y, month:m, day:d} to current date	set str to (m as string) & " " & (d as string) & " " & (y as string)	set today to date str		set fdate to "(" & m & "/1/" & y & ")" as string	set firstDayOfMonth to date fdate		set tomorrow to today + 60 * 60 * 24		set returnV to 0		tell application "iCal"		tell calendar calendarName			set curr to every event whose start date is greater than or equal to firstDayOfMonth and start date is less than or equal to tomorrow			set val to 0			repeat with an_event in curr				set myTestString to my theSplit(summary of an_event, "-")				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))				set val to returnV							end repeat		end tell	end tell	return returnV	end getMilesInMonthon getSecondsInMonth(calendarName)		set {year:y, month:m, day:d} to current date	set str to (m as string) & " " & (d as string) & " " & (y as string)	set today to date str		set fdate to "(" & m & "/1/" & y & ")" as string -- test using march	set firstDayOfMonth to date fdate		set tomorrow to today + 60 * 60 * 24		set returnV to 0		tell application "iCal"		tell calendar calendarName			set curr to every event whose start date is greater than or equal to firstDayOfMonth and start date is less than or equal to tomorrow			set val to 0			set totalSeconds to 0			repeat with an_event in curr				set myTestString to my theSplit(summary of an_event, "-")								set getTime to (my getArrayItem(myTestString, 3))				--getTime = 1:37:30								set myHMS to my theSplit(getTime, ":")				set hour to 0				set secs to 0				set mins to 0								set secs to (my getArrayItem(myHMS, 3)) --30								if secs is -1 then					--no hour					set secs to (my getArrayItem(myHMS, 2)) --30									if secs is -1 then						--no minutes						set secs to (my getArrayItem(myHMS, 1)) --30									else						set mins to (my getArrayItem(myHMS, 1)) --37					end if				else					set hour to (my getArrayItem(myHMS, 1)) --1					set mins to (my getArrayItem(myHMS, 2)) --37					set secs to (my getArrayItem(myHMS, 3)) --30									end if								--				display dialog hour buttons {"OK", "Cancel"} default button "OK" with title "debug"				--				display dialog mins buttons {"OK", "Cancel"} default button "OK" with title "debug"				--				display dialog secs buttons {"OK", "Cancel"} default button "OK" with title "debug"				-- pause here because it's the 1st day of the week and I don't feel like				-- changing the calendar loop to test				set totalSeconds to (totalSeconds + ((hour * 3600) + (mins * 60) + secs)) --5850 + 2145 = 7995				--				display dialog totalSeconds buttons {"OK", "Cancel"} default button "OK" with title "debug"			end repeat		end tell	end tell	return totalSeconds	end getSecondsInMonth--convert seconds to h m son getHMS(totalSeconds)	set mins to 0	set secs to 0	set hour to 0		set mins to (totalSeconds / 60)	set secs to (totalSeconds - (mins * 60))	repeat while mins > 59		set hour to (hour + 1)		set mins to (mins - 60)	end repeat		set hour to (my truncate(hour, 0))	set mins to (my truncate(mins, 0))	set secs to (my truncate(secs, 0))		if mins < 10 then		set mins to "0" & mins	end if	if secs < 10 then		set secs to "0" & secs	end if		set convertSeconds to ("" & hour & ":" & mins & ":" & secs) --5850 =1:37:30	return convertSecondsend getHMSon truncate(aNumber, decimalPlaces)		set aNumeral to "" & aNumber		if aNumeral does not contain "." then		set aNumeral to aNumeral & "."	end if		repeat with i from 1 to decimalPlaces		set aNumeral to aNumeral & "0"	end repeat		repeat with i from 1 to length of aNumeral		if characters i thru -1 of aNumeral does not contain "." then exit repeat	end repeat	try		return (characters (1) thru (i + (decimalPlaces - 1)) of aNumeral as string) + 0	end tryend truncate--returns an array of events for a calendar--not sure if it's doing all--need to find the properties of event--need to iterate through the events of a calendar.--looks for myCalendar, parses the summary to look for the first item before the dash and totals that value for all events--returns the total on findEvent(myCalendar, shoeName)	set eventArray to ""	tell application "iCal"		tell calendar myCalendar			set the_events to every event			set val to 0			repeat with an_event in the_events				--parse				-- use summary				--				log "repeat summary is: " & summary of an_event				set myTestString to my theSplit(summary of an_event, "-")				set shoe to my getArrayItem(my theSplit(myTestString, "-"), 2)				--	log "*******shoe: " & shoe & " ****************" & " shoe2: " & shoeName								--disable checking for sneaker since a complicated input dialog isn't possible with free Applescript								--		if shoeName is equal to shoe then				--			log "only add the following some shoes"								set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))				set val to returnV				--		set returnV to returnV + (my getArrayItem(my theSplit(myTestString2, "-"), 1))				--		end if			end repeat						set theEvent to first event			--			log "calendar is: " & myCalendar			--			log "location is: " & location of theEvent			--			log "description is: " & description of theEvent			--			log "summary is: " & summary of theEvent									set eventArray to eventArray & " " & uid of theEvent			--      		return uid of theEvent		end tell	end tell	return returnVend findEventon theSplitInts(theString, theDelimiter)		set logm to "in theSplitInts " & theString	display dialog logm buttons {"OK", "Cancel"} default button "OK" with title "debug"		-- save delimiters to restore old settings	set oldDelimiters to AppleScript's text item delimiters	-- set delimiters to delimiter to be used	set AppleScript's text item delimiters to theDelimiter	-- create the array	set theArray to every text item of theString	-- restore the old setting	set AppleScript's text item delimiters to oldDelimiters	-- return the result	return theArrayend theSplitIntson theSplit(theString, theDelimiter)	-- save delimiters to restore old settings	set oldDelimiters to AppleScript's text item delimiters	-- set delimiters to delimiter to be used	set AppleScript's text item delimiters to theDelimiter	-- create the array	set theArray to every text item of theString	-- restore the old setting	set AppleScript's text item delimiters to oldDelimiters	-- return the result	return theArrayend theSpliton showEvent(myCalendar)	tell application "iCal"		tell calendar myCalendar			set theEvent to first event			--show theEvent -- show pops it up in the calendar		end tell	end tell	end showEventon getListOfCalendars()		tell application "iCal"		set theCalendarNames to title of every calendar	end tell	return theCalendarNamesend getListOfCalendarson dialogText(shoe, miles)	set milesAsNum to my int_2_string(milesRun, 10)	return shoe & " did " & milesAsNumend dialogTexton int_2_string(the_int, base)	set digit_string to "0123456789ABCDEF"	set the_int to the_int div 1 -- cut off decimals if a float	set e to 0		set r to ""	repeat while the_int > 0		set d to (the_int mod base)		set d to item (d + 1) of digit_string		set r to d & r		set e to e + 1		set the_int to the_int div base	end repeat	if r = "" then		set r to "0"	end if	return rend int_2_stringon number_to_string(this_number)	set this_number to this_number as string	if this_number contains "E+" then		set x to the offset of "." in this_number		set y to the offset of "+" in this_number		set z to the offset of "E" in this_number		set the decimal_adjust to characters (y - (length of this_number)) thru Â			-1 of this_number as string as number		if x is not 0 then			set the first_part to characters 1 thru (x - 1) of this_number as string		else			set the first_part to ""		end if		set the second_part to characters (x + 1) thru (z - 1) of this_number as string		set the converted_number to the first_part		repeat with i from 1 to the decimal_adjust			try				set the converted_number to Â					the converted_number & character i of the second_part			on error				set the converted_number to the converted_number & "0"			end try		end repeat		return the converted_number	else		return this_number	end ifend number_to_stringon write_to_file(this_data, target_file, append_data) -- (string, file path as string, boolean)	try		set the target_file to the target_file as text		set the open_target_file to Â			open for access file target_file with write permission		if append_data is false then Â			set eof of the open_target_file to 0		write this_data to the open_target_file starting at eof		close access the open_target_file		return true	on error		try			close access file target_file		end try		return false	end tryend write_to_fileon WriteLog(the_text)	set this_story to the_text	set this_file to (((path to desktop folder) as text) & "My Running Log")	my write_to_file(this_story, this_file, true)end WriteLog
+" & messageTotalSeconds
+	
+	-- show this when ready to run normal program
+	display dialog combinedMessage buttons {"OK", "Cancel"} default button "OK" with title appTitle
+else
+	set message to (my getHMS(5850))
+	display dialog message buttons {"OK", "Cancel"} default button "OK" with title appTitle
+	
+end if
+-- here on is the functions to do all the calculations
+
+-- if it can't access the array item, return -1
+on getArrayItem(myArray, location)
+	try
+		set x to item location in myArray
+		return x
+	on error errText number errNum
+		return -1
+	end try
+end getArrayItem
+
+-- gets all the miles for a particular running shoe calendar
+on getMilesInMonth(calendarName)
+	
+	set {year:y, month:m, day:d} to current date
+	set str to (m as string) & " " & (d as string) & " " & (y as string)
+	set today to date str
+	
+	set fdate to "(" & m & "/1/" & y & ")" as string
+	set firstDayOfMonth to date fdate
+	
+	set tomorrow to today + 60 * 60 * 24
+	
+	set returnV to 0
+	
+	tell application "iCal"
+		tell calendar calendarName
+			set curr to every event whose start date is greater than or equal to firstDayOfMonth and start date is less than or equal to tomorrow
+			set val to 0
+			repeat with an_event in curr
+				set myTestString to my theSplit(summary of an_event, "-")
+				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))
+				set val to returnV
+				
+			end repeat
+		end tell
+	end tell
+	return returnV
+	
+end getMilesInMonth
+
+on getSecondsInMonth(calendarName)
+	
+	set {year:y, month:m, day:d} to current date
+	set str to (m as string) & " " & (d as string) & " " & (y as string)
+	set today to date str
+	
+	set fdate to "(" & m & "/1/" & y & ")" as string -- test using march
+	set firstDayOfMonth to date fdate
+	
+	set tomorrow to today + 60 * 60 * 24
+	
+	set returnV to 0
+	
+	tell application "iCal"
+		tell calendar calendarName
+			set curr to every event whose start date is greater than or equal to firstDayOfMonth and start date is less than or equal to tomorrow
+			set val to 0
+			set totalSeconds to 0
+			repeat with an_event in curr
+				set myTestString to my theSplit(summary of an_event, "-")
+				
+				set getTime to (my getArrayItem(myTestString, 3))
+				--getTime = 1:37:30
+				
+				set myHMS to my theSplit(getTime, ":")
+				set hour to 0
+				set secs to 0
+				set mins to 0
+				
+				set secs to (my getArrayItem(myHMS, 3)) --30				
+				if secs is -1 then
+					--no hour
+					set secs to (my getArrayItem(myHMS, 2)) --30				
+					if secs is -1 then
+						--no minutes
+						set secs to (my getArrayItem(myHMS, 1)) --30				
+					else
+						set mins to (my getArrayItem(myHMS, 1)) --37
+					end if
+				else
+					set hour to (my getArrayItem(myHMS, 1)) --1
+					set mins to (my getArrayItem(myHMS, 2)) --37
+					set secs to (my getArrayItem(myHMS, 3)) --30
+					
+				end if
+				
+				--				display dialog hour buttons {"OK", "Cancel"} default button "OK" with title "debug"
+				--				display dialog mins buttons {"OK", "Cancel"} default button "OK" with title "debug"
+				--				display dialog secs buttons {"OK", "Cancel"} default button "OK" with title "debug"
+				-- pause here because it's the 1st day of the week and I don't feel like
+				-- changing the calendar loop to test
+				set totalSeconds to (totalSeconds + ((hour * 3600) + (mins * 60) + secs)) --5850 + 2145 = 7995
+				--				display dialog totalSeconds buttons {"OK", "Cancel"} default button "OK" with title "debug"
+			end repeat
+		end tell
+	end tell
+	return totalSeconds
+	
+end getSecondsInMonth
+
+--convert seconds to h m s
+on getHMS(totalSeconds)
+	set mins to 0
+	set secs to 0
+	set hour to 0
+	
+	set mins to (totalSeconds / 60)
+	set secs to (totalSeconds - (mins * 60))
+	repeat while mins > 59
+		set hour to (hour + 1)
+		set mins to (mins - 60)
+	end repeat
+	
+	set hour to (my truncate(hour, 0))
+	set mins to (my truncate(mins, 0))
+	set secs to (my truncate(secs, 0))
+	
+	if mins < 10 then
+		set mins to "0" & mins
+	end if
+	if secs < 10 then
+		set secs to "0" & secs
+	end if
+	
+	set convertSeconds to ("" & hour & ":" & mins & ":" & secs) --5850 =1:37:30
+	return convertSeconds
+end getHMS
+
+
+on truncate(aNumber, decimalPlaces)
+	
+	set aNumeral to "" & aNumber
+	
+	if aNumeral does not contain "." then
+		set aNumeral to aNumeral & "."
+	end if
+	
+	repeat with i from 1 to decimalPlaces
+		set aNumeral to aNumeral & "0"
+	end repeat
+	
+	repeat with i from 1 to length of aNumeral
+		if characters i thru -1 of aNumeral does not contain "." then exit repeat
+	end repeat
+	try
+		return (characters (1) thru (i + (decimalPlaces - 1)) of aNumeral as string) + 0
+	end try
+end truncate
+
+--returns an array of events for a calendar
+--not sure if it's doing all
+--need to find the properties of event
+--need to iterate through the events of a calendar.
+--looks for myCalendar, parses the summary to look for the first item before the dash and totals that value for all events
+--returns the total 
+on findEvent(myCalendar, shoeName)
+	set eventArray to ""
+	tell application "iCal"
+		tell calendar myCalendar
+			set the_events to every event
+			set val to 0
+			repeat with an_event in the_events
+				--parse
+				-- use summary
+				--				log "repeat summary is: " & summary of an_event
+				set myTestString to my theSplit(summary of an_event, "-")
+				set shoe to my getArrayItem(my theSplit(myTestString, "-"), 2)
+				--	log "*******shoe: " & shoe & " ****************" & " shoe2: " & shoeName
+				
+				--disable checking for sneaker since a complicated input dialog isn't possible with free Applescript
+				
+				--		if shoeName is equal to shoe then
+				--			log "only add the following some shoes"
+				
+				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))
+				set val to returnV
+				--		set returnV to returnV + (my getArrayItem(my theSplit(myTestString2, "-"), 1))
+				--		end if
+			end repeat
+			
+			set theEvent to first event
+			--			log "calendar is: " & myCalendar
+			--			log "location is: " & location of theEvent
+			--			log "description is: " & description of theEvent
+			--			log "summary is: " & summary of theEvent
+			
+			
+			set eventArray to eventArray & " " & uid of theEvent
+			--      		return uid of theEvent
+		end tell
+	end tell
+	return returnV
+end findEvent
+
+on theSplitInts(theString, theDelimiter)
+	
+	set logm to "in theSplitInts " & theString
+	display dialog logm buttons {"OK", "Cancel"} default button "OK" with title "debug"
+	
+	-- save delimiters to restore old settings
+	set oldDelimiters to AppleScript's text item delimiters
+	-- set delimiters to delimiter to be used
+	set AppleScript's text item delimiters to theDelimiter
+	-- create the array
+	set theArray to every text item of theString
+	-- restore the old setting
+	set AppleScript's text item delimiters to oldDelimiters
+	-- return the result
+	return theArray
+end theSplitInts
+
+on theSplit(theString, theDelimiter)
+	-- save delimiters to restore old settings
+	set oldDelimiters to AppleScript's text item delimiters
+	-- set delimiters to delimiter to be used
+	set AppleScript's text item delimiters to theDelimiter
+	-- create the array
+	set theArray to every text item of theString
+	-- restore the old setting
+	set AppleScript's text item delimiters to oldDelimiters
+	-- return the result
+	return theArray
+end theSplit
+
+on showEvent(myCalendar)
+	tell application "iCal"
+		tell calendar myCalendar
+			set theEvent to first event
+			--show theEvent -- show pops it up in the calendar
+		end tell
+	end tell
+	
+end showEvent
+
+on getListOfCalendars()
+	
+	tell application "iCal"
+		set theCalendarNames to title of every calendar
+	end tell
+	return theCalendarNames
+end getListOfCalendars
+
+on dialogText(shoe, miles)
+	set milesAsNum to my int_2_string(milesRun, 10)
+	return shoe & " did " & milesAsNum
+end dialogText
+
+on int_2_string(the_int, base)
+	set digit_string to "0123456789ABCDEF"
+	set the_int to the_int div 1 -- cut off decimals if a float
+	set e to 0
+	
+	set r to ""
+	repeat while the_int > 0
+		set d to (the_int mod base)
+		set d to item (d + 1) of digit_string
+		set r to d & r
+		set e to e + 1
+		set the_int to the_int div base
+	end repeat
+	if r = "" then
+		set r to "0"
+	end if
+	return r
+end int_2_string
+
+on number_to_string(this_number)
+	set this_number to this_number as string
+	if this_number contains "E+" then
+		set x to the offset of "." in this_number
+		set y to the offset of "+" in this_number
+		set z to the offset of "E" in this_number
+		set the decimal_adjust to characters (y - (length of this_number)) thru ¬
+			-1 of this_number as string as number
+		if x is not 0 then
+			set the first_part to characters 1 thru (x - 1) of this_number as string
+		else
+			set the first_part to ""
+		end if
+		set the second_part to characters (x + 1) thru (z - 1) of this_number as string
+		set the converted_number to the first_part
+		repeat with i from 1 to the decimal_adjust
+			try
+				set the converted_number to ¬
+					the converted_number & character i of the second_part
+			on error
+				set the converted_number to the converted_number & "0"
+			end try
+		end repeat
+		return the converted_number
+	else
+		return this_number
+	end if
+end number_to_string
+
+
+on write_to_file(this_data, target_file, append_data) -- (string, file path as string, boolean)
+	try
+		set the target_file to the target_file as text
+		set the open_target_file to ¬
+			open for access file target_file with write permission
+		if append_data is false then ¬
+			set eof of the open_target_file to 0
+		write this_data to the open_target_file starting at eof
+		close access the open_target_file
+		return true
+	on error
+		try
+			close access file target_file
+		end try
+		return false
+	end try
+end write_to_file
+
+on WriteLog(the_text)
+	set this_story to the_text
+	set this_file to (((path to desktop folder) as text) & "My Running Log")
+	my write_to_file(this_story, this_file, true)
+end WriteLog
+
