@@ -293,7 +293,7 @@ on number_to_string(this_number)
 		set x to the offset of "." in this_number
 		set y to the offset of "+" in this_number
 		set z to the offset of "E" in this_number
-		-- git doesn't recognize the special character (¬)  by typing option-L
+		-- github doesn't recognize the special character (¬)  by typing option-L
 		set the decimal_adjust to characters (y - (length of this_number)) thru ¬
 			-1 of this_number as string as number
 		if x is not 0 then
@@ -305,7 +305,7 @@ on number_to_string(this_number)
 		set the converted_number to the first_part
 		repeat with i from 1 to the decimal_adjust
 			try
-				-- git doesn't recognize the special character by typing option-L
+				-- github doesn't recognize the special character by typing option-L
 				set the converted_number to ¬
 					the converted_number & character i of the second_part
 			on error
