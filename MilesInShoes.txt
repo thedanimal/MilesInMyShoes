@@ -5,49 +5,76 @@ set appTitle to "Running App"
 -- I need to add another Calendar for each sneaker
 -- Better to query for Calendars instead of needing to add one for each new sneaker
 -- getListOfCalendars gets the calendars.
-set runningCalendar1 to "T2"
-set runningCalendar2 to "red1"
-set runningCalendar3 to "brooksGreen"
-set runningCalendar4 to "flowRidder"
 
-set shoeWorn1 to runningCalendar1
-set shoeWorn2 to runningCalendar2
-set shoeWorn3 to runningCalendar3
-set shoeWorn4 to runningCalendar4
+-- can I use a global variable for total seconds so I don't have to iterate through the calendars twice?
 
-set totalMiles1 to my findEvent(runningCalendar1, shoeWorn1)
-set totalMiles2 to my findEvent(runningCalendar2, shoeWorn2)
-set totalMiles3 to my findEvent(runningCalendar3, shoeWorn3)
-set totalMiles4 to my findEvent(runningCalendar4, shoeWorn4)
+set isDebug to 0
 
-log "total miles: " & totalMiles1
-
-set message1 to my dialogText(shoeWorn1, totalMiles1)
-set message2 to my dialogText(shoeWorn2, totalMiles2)
-set message3 to my dialogText(shoeWorn3, totalMiles3)
-set message4 to my dialogText(shoeWorn4, totalMiles4)
-
-set milesRun1 to my getMilesInMonth(runningCalendar1)
-set milesRun2 to my getMilesInMonth(runningCalendar2)
-set milesRun3 to my getMilesInMonth(runningCalendar3)
-set milesRun4 to my getMilesInMonth(runningCalendar4)
-
--- this means 
-set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
-
-set combinedMessage to message1 & "
+if isDebug is 0 then
+	set runningCalendar1 to "T2"
+	set runningCalendar2 to "red1"
+	set runningCalendar3 to "brooksGreen"
+	set runningCalendar4 to "flowRidder"
+	
+	set shoeWorn1 to runningCalendar1
+	set shoeWorn2 to runningCalendar2
+	set shoeWorn3 to runningCalendar3
+	set shoeWorn4 to runningCalendar4
+	
+	set totalMiles1 to my findEvent(runningCalendar1, shoeWorn1)
+	set totalMiles2 to my findEvent(runningCalendar2, shoeWorn2)
+	set totalMiles3 to my findEvent(runningCalendar3, shoeWorn3)
+	set totalMiles4 to my findEvent(runningCalendar4, shoeWorn4)
+	
+	set message1 to my dialogText(shoeWorn1, totalMiles1)
+	set message2 to my dialogText(shoeWorn2, totalMiles2)
+	set message3 to my dialogText(shoeWorn3, totalMiles3)
+	set message4 to my dialogText(shoeWorn4, totalMiles4)
+	
+	set SecondsRun1 to my getSecondsInMonth(runningCalendar1)
+	set SecondsRun2 to my getSecondsInMonth(runningCalendar2)
+	set SecondsRun3 to my getSecondsInMonth(runningCalendar3)
+	set SecondsRun4 to my getSecondsInMonth(runningCalendar4)
+	
+	set milesRun1 to my getMilesInMonth(runningCalendar1)
+	set milesRun2 to my getMilesInMonth(runningCalendar2)
+	set milesRun3 to my getMilesInMonth(runningCalendar3)
+	set milesRun4 to my getMilesInMonth(runningCalendar4)
+	
+	set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
+	set messageTotalSeconds to "Time for the month: " & (my getHMS(SecondsRun1 + SecondsRun2 + SecondsRun3 + SecondsRun4))
+	
+	--add another line that gets the month pace
+	
+	set messageTotalMiles to messageTotalMiles 
+	set combinedMessage to messageTotalMiles
+	
+	set combinedMessage to message1 & "
 " & message2 & "
 " & message3 & "
 " & message4 & "
-" & messageTotalMiles
-display dialog combinedMessage buttons {"OK", "Cancel"} default button "OK" with title appTitle
 
+" & messageTotalMiles & "
+" & messageTotalSeconds
+	display dialog combinedMessage buttons {"OK", "Cancel"} default button "OK" with title appTitle
+else
+	set message to (my getHMS(5850))
+	display dialog message buttons {"OK", "Cancel"} default button "OK" with title appTitle
+	
+end if
+-- here on are the functions to do all the calculations ---------------------
+
+-- if it can't access the array item, return -1
 on getArrayItem(myArray, location)
-  set x to item location in myArray
-	return x
+	try
+		set x to item location in myArray
+		return x
+	on error errText number errNum
+		return -1
+	end try
 end getArrayItem
 
---gets all the miles for a particular running shoe calendar
+-- gets all the miles for a particular running shoe calendar
 on getMilesInMonth(calendarName)
 	
 	set {year:y, month:m, day:d} to current date
@@ -77,6 +104,108 @@ on getMilesInMonth(calendarName)
 	
 end getMilesInMonth
 
+on getSecondsInMonth(calendarName)
+	
+	set {year:y, month:m, day:d} to current date
+	set str to (m as string) & " " & (d as string) & " " & (y as string)
+	set today to date str
+	
+	set fdate to "(" & m & "/1/" & y & ")" as string -- test using march
+	set firstDayOfMonth to date fdate
+	
+	set tomorrow to today + 60 * 60 * 24
+	
+	set returnV to 0
+	
+	tell application "iCal"
+		tell calendar calendarName
+			set curr to every event whose start date is greater than or equal to firstDayOfMonth and start date is less than or equal to tomorrow
+			set val to 0
+			set totalSeconds to 0
+			repeat with an_event in curr
+				set myTestString to my theSplit(summary of an_event, "-")
+				
+				set getTime to (my getArrayItem(myTestString, 3))
+				
+				set myHMS to my theSplit(getTime, ":")
+				set hour to 0
+				set secs to 0
+				set mins to 0
+				
+				set secs to (my getArrayItem(myHMS, 3)) --30				
+				if secs is -1 then
+					--no hour
+					set secs to (my getArrayItem(myHMS, 2)) --30				
+					if secs is -1 then
+						--no minutes
+						set secs to (my getArrayItem(myHMS, 1)) --30				
+					else
+						set mins to (my getArrayItem(myHMS, 1)) --37
+					end if
+				else
+					set hour to (my getArrayItem(myHMS, 1)) --1
+					set mins to (my getArrayItem(myHMS, 2)) --37
+					set secs to (my getArrayItem(myHMS, 3)) --30
+					
+				end if
+				
+				set totalSeconds to (totalSeconds + ((hour * 3600) + (mins * 60) + secs)) --5850 + 2145 = 7995
+			end repeat
+		end tell
+	end tell
+	return totalSeconds
+	
+end getSecondsInMonth
+
+--convert seconds to h m s
+on getHMS(totalSeconds)
+	set mins to 0
+	set secs to 0
+	set hour to 0
+	
+	set mins to (totalSeconds / 60)
+	set mins to (my truncate(mins,0))
+	set secs to (totalSeconds - (mins * 60))
+	repeat while mins > 59
+		set hour to (hour + 1)
+		set mins to (mins - 60)
+	end repeat
+	
+	set hour to (my truncate(hour, 0))
+	set mins to (my truncate(mins, 0))
+	set secs to (my truncate(secs, 0))
+	
+	if mins < 10 then
+		set mins to "0" & mins
+	end if
+	if secs < 10 then
+		set secs to "0" & secs
+	end if
+	
+	set convertSeconds to ("" & hour & ":" & mins & ":" & secs) 
+	return convertSeconds
+end getHMS
+
+
+on truncate(aNumber, decimalPlaces)
+	
+	set aNumeral to "" & aNumber
+	
+	if aNumeral does not contain "." then
+		set aNumeral to aNumeral & "."
+	end if
+	
+	repeat with i from 1 to decimalPlaces
+		set aNumeral to aNumeral & "0"
+	end repeat
+	
+	repeat with i from 1 to length of aNumeral
+		if characters i thru -1 of aNumeral does not contain "." then exit repeat
+	end repeat
+	try
+		return (characters (1) thru (i + (decimalPlaces - 1)) of aNumeral as string) + 0
+	end try
+end truncate
 
 --returns an array of events for a calendar
 --not sure if it's doing all
@@ -92,32 +221,15 @@ on findEvent(myCalendar, shoeName)
 			set val to 0
 			repeat with an_event in the_events
 				--parse
-				-- use summary
-				--				log "repeat summary is: " & summary of an_event
-				set myTestString to my theSplit(summary of an_event, "-")
+				set myTestString to my theSplit(summary of an_event, "-")				
 				set shoe to my getArrayItem(my theSplit(myTestString, "-"), 2)
-				--	log "*******shoe: " & shoe & " ****************" & " shoe2: " & shoeName
-				
-				--disable checking for sneaker since a complicated input dialog isn't possible with free Applescript
-				
-				--		if shoeName is equal to shoe then
-				--			log "only add the following some shoes"
 				
 				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))
 				set val to returnV
-				--		set returnV to returnV + (my getArrayItem(my theSplit(myTestString2, "-"), 1))
-				--		end if
 			end repeat
 			
 			set theEvent to first event
-			--			log "calendar is: " & myCalendar
-			--			log "location is: " & location of theEvent
-			--			log "description is: " & description of theEvent
-			--			log "summary is: " & summary of theEvent
-			
-			
 			set eventArray to eventArray & " " & uid of theEvent
-			--      		return uid of theEvent
 		end tell
 	end tell
 	return returnV
@@ -184,7 +296,8 @@ on number_to_string(this_number)
 		set x to the offset of "." in this_number
 		set y to the offset of "+" in this_number
 		set z to the offset of "E" in this_number
-		set the decimal_adjust to characters (y - (length of this_number)) thru Â¬
+		-- github doesn't recognize the special character (¬)  by typing option-L
+		set the decimal_adjust to characters (y - (length of this_number)) thru ¬
 			-1 of this_number as string as number
 		if x is not 0 then
 			set the first_part to characters 1 thru (x - 1) of this_number as string
@@ -195,7 +308,8 @@ on number_to_string(this_number)
 		set the converted_number to the first_part
 		repeat with i from 1 to the decimal_adjust
 			try
-				set the converted_number to Â¬
+				-- github doesn't recognize the special character by typing option-L
+				set the converted_number to ¬
 					the converted_number & character i of the second_part
 			on error
 				set the converted_number to the converted_number & "0"
@@ -207,13 +321,12 @@ on number_to_string(this_number)
 	end if
 end number_to_string
 
-
-on write_to_file(this_data, target_file, append_data) -- (string, file path as string, boolean)
+on write_to_file(this_data, target_file, append_data)
 	try
 		set the target_file to the target_file as text
-		set the open_target_file to Â¬
+		set the open_target_file to ¬
 			open for access file target_file with write permission
-		if append_data is false then Â¬
+		if append_data is false then ¬
 			set eof of the open_target_file to 0
 		write this_data to the open_target_file starting at eof
 		close access the open_target_file
@@ -231,3 +344,4 @@ on WriteLog(the_text)
 	set this_file to (((path to desktop folder) as text) & "My Running Log")
 	my write_to_file(this_story, this_file, true)
 end WriteLog
+
