@@ -4,7 +4,7 @@ set appTitle to "Running App"
 -- Better to query for Calendars instead of needing to add one for each new sneaker
 -- getListOfCalendars gets the calendars.
 
--- can I use a global variable for total seconds so I don't have to iterate through the calendars twice?
+-- Can I use a global variable for total seconds so I don't have to iterate through the calendars twice?
 
 set isDebug to 0
 
