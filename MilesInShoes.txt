@@ -39,12 +39,22 @@ if isDebug is 0 then
 	set milesRun3 to my getMilesInMonth(runningCalendar3)
 	set milesRun4 to my getMilesInMonth(runningCalendar4)
 	
-	set messageTotalMiles to "Miles for the month: " & milesRun1 + milesRun2 + milesRun3 + milesRun4
-	set messageTotalSeconds to "Time for the month: " & (my getHMS(SecondsRun1 + SecondsRun2 + SecondsRun3 + SecondsRun4))
+	set totalDistance to (milesRun1 + milesRun2 + milesRun3 + milesRun4)
+	set totalTime to (SecondsRun1 + SecondsRun2 + SecondsRun3 + SecondsRun4)
+	
+	set pace to 0
+	if totalDistance is not 0 then
+		set pace to (totalTime / totalDistance)
+	end if
+	set monthPace to (my getHMS(pace))
+	
+	set messageTotalMiles to "Miles for the month: " & totalDistance
+	set messageTotalSeconds to "Time for the month: " & (my getHMS(totalTime))
+	set messageMonthPace to "Month pace: " & monthPace
 	
 	--add another line that gets the month pace
 	
-	set messageTotalMiles to messageTotalMiles 
+	set messageTotalMiles to messageTotalMiles
 	set combinedMessage to messageTotalMiles
 	
 	set combinedMessage to message1 & "
@@ -53,10 +63,20 @@ if isDebug is 0 then
 " & message4 & "
 
 " & messageTotalMiles & "
-" & messageTotalSeconds
+" & messageTotalSeconds & "
+" & messageMonthPace
 	display dialog combinedMessage buttons {"OK", "Cancel"} default button "OK" with title appTitle
 else
-	set message to (my getHMS(5850))
+	
+	set totalDistance to 10
+	set totalTime to ((74 * 60) + (15)) -- 4440 + 15 = 4455
+	set pace to 0
+	if totalDistance is not 0 then
+		set pace to (totalTime / totalDistance)
+	end if
+	--rounding errors in getHMS -- 445.5 is not properly converted to h m s	
+	set monthPace to (my getHMS(pace))
+	set message to "Month pace: " & monthPace
 	display dialog message buttons {"OK", "Cancel"} default button "OK" with title appTitle
 	
 end if
@@ -157,12 +177,13 @@ end getSecondsInMonth
 
 --convert seconds to h m s
 on getHMS(totalSeconds)
+	
 	set mins to 0
 	set secs to 0
 	set hour to 0
 	
 	set mins to (totalSeconds / 60)
-	set mins to (my truncate(mins,0))
+	set mins to (my truncate(mins, 0))
 	set secs to (totalSeconds - (mins * 60))
 	repeat while mins > 59
 		set hour to (hour + 1)
@@ -180,7 +201,7 @@ on getHMS(totalSeconds)
 		set secs to "0" & secs
 	end if
 	
-	set convertSeconds to ("" & hour & ":" & mins & ":" & secs) 
+	set convertSeconds to ("" & hour & ":" & mins & ":" & secs)
 	return convertSeconds
 end getHMS
 
@@ -219,7 +240,7 @@ on findEvent(myCalendar, shoeName)
 			set val to 0
 			repeat with an_event in the_events
 				--parse
-				set myTestString to my theSplit(summary of an_event, "-")				
+				set myTestString to my theSplit(summary of an_event, "-")
 				set shoe to my getArrayItem(my theSplit(myTestString, "-"), 2)
 				
 				set returnV to val + (my getArrayItem(my theSplit(myTestString, "-"), 1))
@@ -295,7 +316,7 @@ on number_to_string(this_number)
 		set y to the offset of "+" in this_number
 		set z to the offset of "E" in this_number
 		-- github doesn't recognize the special character (¬)  by typing option-L
-		set the decimal_adjust to characters (y - (length of this_number)) thru ¬
+		set the decimal_adjust to characters (y - (length of this_number)) thru Â
 			-1 of this_number as string as number
 		if x is not 0 then
 			set the first_part to characters 1 thru (x - 1) of this_number as string
@@ -307,7 +328,7 @@ on number_to_string(this_number)
 		repeat with i from 1 to the decimal_adjust
 			try
 				-- github doesn't recognize the special character by typing option-L
-				set the converted_number to ¬
+				set the converted_number to Â
 					the converted_number & character i of the second_part
 			on error
 				set the converted_number to the converted_number & "0"
@@ -322,9 +343,9 @@ end number_to_string
 on write_to_file(this_data, target_file, append_data)
 	try
 		set the target_file to the target_file as text
-		set the open_target_file to ¬
+		set the open_target_file to Â
 			open for access file target_file with write permission
-		if append_data is false then ¬
+		if append_data is false then Â
 			set eof of the open_target_file to 0
 		write this_data to the open_target_file starting at eof
 		close access the open_target_file
