@@ -162,6 +162,7 @@ on getHMS(totalSeconds)
 	set hour to 0
 	
 	set mins to (totalSeconds / 60)
+	set mins to (my truncate(mins,0))
 	set secs to (totalSeconds - (mins * 60))
 	repeat while mins > 59
 		set hour to (hour + 1)
